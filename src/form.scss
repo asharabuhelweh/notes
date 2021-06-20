@@ -1,0 +1,56 @@
+.App {
+  text-align: center;
+}
+
+
+
+
+.form {
+  min-height: 5vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  font-size: calc(10px + 2vmin);
+  color:black;
+  text-align: center;
+
+}
+
+.buttons{
+  min-height: 5vh;
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  
+  font-size: calc(10px + 2vmin);
+  color:black;
+  text-align: center;
+}
+#get, #post, #put , #deleted{
+  background-color: rgb(184, 179, 179);
+  margin: 13px;
+
+}
+
+.text{
+  height: 50vh;
+  display: flex;
+  // align-items: center;
+  // justify-content: center;
+  margin-top: 25px;
+  margin: 20px;
+  padding: 25px;
+  margin-bottom: 40px;
+  
+  font-size: calc(10px + 1vmin);
+  color:black;
+  text-align: center;
+  background-color: rgb(243, 240, 240);
+  border: solid black 1px;
+}
+
+
+h3{
+
+}
