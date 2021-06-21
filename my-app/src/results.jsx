@@ -8,9 +8,9 @@ class Results extends React.Component {
 
 
         <div className='result'>
-          <p>count:  {this.props.count}</p>
-          <p>Headers : <JSONPretty id="json-pretty" data={this.props.headers}></JSONPretty></p>
-          <p>Results : <JSONPretty id="json-pretty" data={this.props.results}></JSONPretty> </p>
+          <p>Count:  {this.props.count}</p>
+          <p>Headers : <JSONPretty data={this.props.headers}></JSONPretty></p>
+          <p>Results : <JSONPretty  data={this.props.results}></JSONPretty> </p>
         </div>
       </React.Fragment>
 
