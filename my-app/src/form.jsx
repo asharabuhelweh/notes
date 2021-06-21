@@ -6,7 +6,7 @@ class Form extends React.Component {
     super(props);
     this.state = {
       url: '',
-      method: 'GET'
+      method: ''
     }
   }
 
@@ -35,7 +35,6 @@ class Form extends React.Component {
   handleSubmit= async e =>{
     e.preventDefault();
     let url = this.state.url;
-    // let method= this.state.method;
     let raw = await fetch(`${url}`);
     let data = await raw.json();
     // console.log(await data);
@@ -44,8 +43,8 @@ class Form extends React.Component {
 
     
     let headers= await fetch(url).then((response) => {    
-      for (let pair of response.headers.entries()) {
-          return `"${pair[0]}" : "${pair[1]}"` ;
+      for (let header of response.headers.entries()) {
+          return `"${header[0]}" : "${header[1]}"` ;
       }
     });
     console.log(await headers);

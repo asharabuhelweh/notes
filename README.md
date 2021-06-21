@@ -1,7 +1,7 @@
 # RESTy
 ## Component Based UI
 ### Author: As-har Abuhelweh
-* [submission PR](https://github.com/asharabuhelweh/notes/pull/2) .
+* [submission PR](https://github.com/asharabuhelweh/notes/pull/2)
 
 ### Running the app
 - `npm start`
@@ -16,7 +16,7 @@
 
 
 ### Phase 2
-* [submission PR](https://github.com/asharabuhelweh/notes/pull/3)
-*  [deployment on Github](https://resty-ashar.herokuapp.com/)
+* [submission PR](https://github.com/asharabuhelweh/notes/pull/2)
+*  [deployment on Github](https://asharabuhelweh.github.io/resty/)
 
 ![](uml2.PNG)
