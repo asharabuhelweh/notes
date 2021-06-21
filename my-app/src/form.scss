@@ -34,23 +34,21 @@
 }
 
 .text{
-  height: 50vh;
-  display: flex;
+  height: 5vh;
   // align-items: center;
   // justify-content: center;
-  margin-top: 25px;
   margin: 20px;
   padding: 25px;
-  margin-bottom: 40px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  padding-top: 0px;
   
   font-size: calc(10px + 1vmin);
   color:black;
   text-align: center;
   background-color: rgb(243, 240, 240);
   border: solid black 1px;
+  border-bottom: none;
 }
 
 
-h3{
-
-}

@@ -6,7 +6,7 @@ class Form extends React.Component {
     super(props);
     this.state = {
       url: '',
-      method: ''
+      method: 'GET'
     }
   }
 
@@ -26,15 +26,36 @@ class Form extends React.Component {
 
     this.setState({ method });
 
+   
 
 
+  }
 
+
+  handleSubmit= async e =>{
+    e.preventDefault();
+    let url = this.state.url;
+    // let method= this.state.method;
+    let raw = await fetch(`${url}`);
+    let data = await raw.json();
+    // console.log(await data);
+    const results= data.results;
+    const count = data.count;
+
+    
+    let headers= await fetch(url).then((response) => {    
+      for (let pair of response.headers.entries()) {
+          return `"${pair[0]}" : "${pair[1]}"` ;
+      }
+    });
+    console.log(await headers);
+    this.props.handler(results,count,headers);
   }
 
   render() {
     return (
       <div>
-        <form className='form'>
+        <form  onSubmit={this.handleSubmit} className='form'>
           <label htmlFor="">URL:</label>
           <input id='input' onChange={this.handleUrl} />
           <button type='submit' onClick={this.handleClick} >GO!</button>
@@ -50,7 +71,7 @@ class Form extends React.Component {
 
         </div>
         <div className="text">
-          <h3>{this.state.method} {this.state.url}</h3>
+         <h3>{this.state.method} {this.state.url}</h3>
 
         </div>
       </div>
