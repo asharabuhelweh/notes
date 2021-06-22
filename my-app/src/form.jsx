@@ -6,7 +6,7 @@ class Form extends React.Component {
     super(props);
     this.state = {
       url: '',
-      method: ''
+      method: 'GET'
     }
   }
 
@@ -26,38 +26,82 @@ class Form extends React.Component {
 
     this.setState({ method });
 
-   
+
 
 
   }
 
 
-  handleSubmit= async e =>{
+  handleSubmit = async e => {
     e.preventDefault();
+    let textBox = e.target.body.value;
     let url = this.state.url;
-    let raw = await fetch(`${url}`);
-    let data = await raw.json();
-    // console.log(await data);
-    const results= data.results;
-    const count = data.count;
+    let raw;
+    if ((this.state.method === 'Put' || this.state.method === 'Post')) {
+      raw = await fetch(url, {
+        method: this.state.method, body: textBox, mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    
-    let headers= await fetch(url).then((response) => {    
+    } else if (this.state.method === 'Get' || this.state.method === 'Delete') {
+
+      raw = await fetch(url, { method: this.state.method });
+    }
+    // let raw = await fetch(`${url}`,{method:this.state.method});
+    let data = await raw.json();
+    let allResult = [];
+    if (data) {
+      let request = `${this.state.method},${this.state.url},${textBox}`;
+      let savedUrl = JSON.parse(localStorage.getItem('request'));
+      if (savedUrl) {
+        Object.values(savedUrl).map((element) => {
+          if (!allResult.includes(element)) {
+            allResult.push(element)
+          }
+        });
+      }
+      if (!allResult.includes(request)) {
+        allResult.push(request)
+        allResult.filter((element, index) => allResult.indexOf(element) === index)
+        localStorage.setItem('request', JSON.stringify(allResult));
+      }
+
+    }
+    console.log(await data);
+    let results;
+    if (data.results) {
+      results = data.results;
+    } else {
+      results = data
+    }
+    let count;
+    if (data.count) {
+      count = data.count;
+    } else {
+      count = data.length
+    }
+
+
+
+    let headers = await fetch(url).then((response) => {
       for (let header of response.headers.entries()) {
-          return `"${header[0]}" : "${header[1]}"` ;
+        return `"${header[0]}" : "${header[1]}"`;
       }
     });
-    console.log(await headers);
-    this.props.handler(results,count,headers);
+    this.props.handler(results, count, headers);
   }
 
   render() {
     return (
       <div>
-        <form  onSubmit={this.handleSubmit} className='form'>
+        <form onSubmit={this.handleSubmit} className='form'>
           <label htmlFor="">URL:</label>
           <input id='input' onChange={this.handleUrl} />
           <button type='submit' onClick={this.handleClick} >GO!</button>
+          <textarea rows="4" cols="40" id="textarea" name="body" placeholder="JSON body"></textarea>
+
         </form>
 
         <div className="buttons">
@@ -67,10 +111,9 @@ class Form extends React.Component {
           <button onClick={this.handleMethod} id="get" value="Delete">Delete</button>
 
 
-
         </div>
         <div className="text">
-         <h3>{this.state.method} {this.state.url}</h3>
+          <h3>{this.state.method} {this.state.url}</h3>
 
         </div>
       </div>
