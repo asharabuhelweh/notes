@@ -1,48 +1,87 @@
-import './App.scss';
-
 import React from 'react';
-import Header from './header';
-import Form from './form';
-import Footer from './footer';
-import Results from './results';
+import { Route, Switch } from 'react-router-dom';
+import {BrowserRouter as Router} from "react-router-dom";
+import './App.scss';
+import Header from './header'
+import Footer from './footer'
+import Form from './form'
+import Result from './result'
+import History from './history';
+import Help from './help';
 
 
-
-// function App() {
-//   return (
-//     <React.Fragment>
-//       <Header />
-//       <Form />
-//       <Footer />
-//     </React.Fragment>
-//   );
-// }
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-
+  constructor (props){
+    super (props);
     this.state = {
-      results: [],
-      count: 0,
-      headers:''
+      results : [],
+      count : 0,
+      header : '',
+      array : [],
+      method : '',
+      URL : '',
+      body : {},
+      flag : false,
     }
     this.handleForm = this.handleForm.bind(this);
+    this.handleHistory = this.handleHistory.bind (this);
   }
-    handleForm(results,count,headers){
-      this.setState({ results, count,headers });
-    }
-    render(){
-      return (
-        <React.Fragment>
-          <Header />
-          <Form handler={this.handleForm} />
-          <Results results={this.state.results} count={this.state.count} headers={this.state.headers} />
-          <Footer />
-        </React.Fragment>
-      );
-    }
+
+
+  handleForm (results,count, header , array , flag){
+    this.setState({ results, count  , header , array ,flag});
+  }
+
+  handleHistory(array, flag ){
+    this.setState ({...this.state, array : array, flag : flag })
+  };
+  afterSubmitHandler = (method, URL , body)=>{
+    this.setState ({method , URL , body})
+    
+  }
+
+  componentDidMount = ()=>{
+
+    let array = []
+      let oldResult =JSON.parse(localStorage.getItem('request'))
+      if (oldResult){
+        Object.values(oldResult).map((item) => {
+          if (!array.includes (item)){
+            array.push (item)
+          }
+        });
+      }
+    this.setState({array})
 
   }
 
-  export default App;
+  render(){
+    return(
+      <React.Fragment>
+        <Router>
+      <Header/>
+      <Switch>
+      <main>
+        
+        <Route exact path="/">
+        <Form handler={this.handleForm}  methodH= {this.state.method} urlH={this.state.URL}  bodyH={this.state.body} flag={this.state.flag}/> 
+      <Result results = {this.state.results} count={this.state.count} header={this.state.header}/>
+      <History historyHandler={this.handleHistory} after={this.afterSubmitHandler}   arr={this.state.array} flag={this.state.flag} />
+        </Route>
+        <Route exact path="/history">
+        <History historyHandler={this.handleHistory} after={this.afterSubmitHandler}   arr={this.state.array} flag={this.state.flag} />
+        </Route>
+     <Route exact path="/help">
+        <Help/>
+     </Route>
+      </main>
+      </Switch>
+      <Footer/>
+      </Router>
+      </React.Fragment>
+    )
+  }
+}
+
+export default App;
