@@ -1,13 +1,20 @@
 import React from 'react';
 import './form.scss'
+import IF from "./if";
+import Loader from "./Loader";
 
 class Form extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       url: '',
-      method: 'GET'
+      method: 'GET',
+      results: [],
+      body: {},
+      flag: false
     }
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.toggle = this.toggle.bind(this)
   }
 
   handleUrl = e => {
@@ -25,72 +32,101 @@ class Form extends React.Component {
     let method = e.target.value;
 
     this.setState({ method });
-
-
-
-
   }
 
 
   handleSubmit = async e => {
     e.preventDefault();
-    let textBox = e.target.body.value;
-    let url = this.state.url;
-    let raw;
-    if ((this.state.method === 'Put' || this.state.method === 'Post')) {
-      raw = await fetch(url, {
-        method: this.state.method, body: textBox, mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    setTimeout(async () => {
+      let raw;
+      let method2;
+      let url2;
+      let body2;
+      if (this.props.methodH && this.props.urlH) {
+        method2 = this.props.methodH;
+        url2 = this.props.urlH;
+        if (this.props.bodyH) {
+          body2 = await JSON.stringify(this.props.bodyH)
+
+        } else {
+          body2 = e.target.body.value
+        }
+
+
+      } else {
+        method2 = this.state.method
+        url2 = this.state.url
+        body2 = e.target.body.value
+
+      }
+      if ((method2 === 'Put' || method2 === 'Post')) {
+        raw = await fetch(url2, {
+          method: method2, body: body2, mode: "cors",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else if (method2 === 'Get' || method2 === 'Delete') {
+
+        raw = await fetch(url2, { method: method2 });
+      }
+
+      this.setState({ body: body2, flag: !this.state.flag })
+      let header = await fetch(url2).then((response) => {
+        for (let pair of response.headers.entries()) {
+          let n = pair.length
+          let string = '';
+          for (let i = 0; i < n; i++) {
+            if (i % 2 === 0) {
+              string = string + pair[i] + ': ' + pair[i + 1]
+            }
+          }
+          return string;
+        }
       });
 
-    } else if (this.state.method === 'Get' || this.state.method === 'Delete') {
 
-      raw = await fetch(url, { method: this.state.method });
-    }
-    // let raw = await fetch(`${url}`,{method:this.state.method});
-    let data = await raw.json();
-    let allResult = [];
-    if (data) {
-      let request = `${this.state.method},${this.state.url},${textBox}`;
-      let savedUrl = JSON.parse(localStorage.getItem('request'));
-      if (savedUrl) {
-        Object.values(savedUrl).map((element) => {
-          if (!allResult.includes(element)) {
-            allResult.push(element)
-          }
-        });
-      }
-      if (!allResult.includes(request)) {
-        allResult.push(request)
-        allResult.filter((element, index) => allResult.indexOf(element) === index)
-        localStorage.setItem('request', JSON.stringify(allResult));
+      let data = await raw.json()
+      let array = [];
+      if (data) {
+        this.setState({ results: data, body: body2, flag: !this.state.flag });
+        let str = `${this.state.method},${this.state.url},${body2}`
+        let oldResult = JSON.parse(localStorage.getItem('request'))
+        if (oldResult) {
+          Object.values(oldResult).map((item) => {
+            if (!array.includes(item)) {
+              array.push(item)
+            }
+          });
+        }
+        if (!array.includes(str)) {
+          array.push(str)
+          localStorage.setItem('request', JSON.stringify(array));
+        }
+
       }
 
-    }
-    console.log(await data);
-    let results;
-    if (data.results) {
-      results = data.results;
-    } else {
-      results = data
-    }
-    let count;
-    if (data.count) {
-      count = data.count;
-    } else {
-      count = data.length
-    }
-
-
-
-    let headers = await fetch(url).then((response) => {
-      for (let header of response.headers.entries()) {
-        return `"${header[0]}" : "${header[1]}"`;
+      let results;
+      if (data.results) {
+        results = data.results;
+      } else {
+        results = data
       }
-    });
-    this.props.handler(results, count, headers);
+      let count;
+      if (data.count) {
+        count = data.count;
+      } else {
+        count = data.length
+      }
+      let flag = this.state.flag
+      this.props.handler(results, count, header, array, flag);
+
+    }, 2000);
+  }
+
+
+  toggle = () => {
+    this.setState({ flag: !this.state.flag })
   }
 
   render() {
@@ -99,11 +135,15 @@ class Form extends React.Component {
         <form onSubmit={this.handleSubmit} className='form'>
           <label htmlFor="">URL:</label>
           <input id='input' onChange={this.handleUrl} />
+          <h4>{this.props.methodH || this.state.method}  :  {this.props.urlH || this.state.url} </h4>
+
           <button type='submit' onClick={this.handleClick} >GO!</button>
           <textarea rows="4" cols="40" id="textarea" name="body" placeholder="JSON body"></textarea>
 
         </form>
-
+        <IF condition={this.state.flag}>
+          <Loader></Loader>
+        </IF>
         <div className="buttons">
           <button onClick={this.handleMethod} id="get" value="Get">Get</button>
           <button onClick={this.handleMethod} id="post" value="Post">Post</button>
